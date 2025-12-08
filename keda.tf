@@ -24,5 +24,12 @@ resource "helm_release" "keda" {
     })
   ]
 
-  depends_on = [module.eks]
+  # Wait for cluster and IRSA to be ready
+  depends_on = [
+    module.eks,
+    module.keda_irsa
+  ]
+
+  # Add timeout to handle slow cluster startup
+  timeout = 300
 }

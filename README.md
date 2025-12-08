@@ -120,13 +120,7 @@ This Terraform project creates an AWS EKS cluster with KEDA addon for autoscalin
 ## To do:
 [ ] Add safety confirm for cleanup steps
 [ ] Improve files and folder structure
-[ ] Improve security: Adjust user role and security groups to follow least privilege principle
+[ ] Improve security
+   -  Adjust user role and security groups to follow least privilege principle
 [ ] Fine tune scaling up and down for a more progressive behavior
-[ ] Troubleshoot version 1.33 and 1.34 errors:
-   ```bash
-   │ Error: updating EKS Node Group (ha-eks:ha-eks-node-group-20251207201318592200000016) version: operation error EKS: UpdateNodegroupVersion, https response error StatusCode: 400, RequestID: 5510a08f-52fd-4ab8-975a-ad8bb2f1a311, InvalidParameterException: AMI Type AL2_x86_64 is only supported for kubernetes versions 1.32 or earlier
-   │ 
-   │   with module.eks.module.eks_managed_node_group["main"].aws_eks_node_group.this[0],
-   │   on .terraform/modules/eks/modules/eks-managed-node-group/main.tf line 308, in resource "aws_eks_node_group" "this":
-   │  308: resource "aws_eks_node_group" "this" {
-   ```
+[ ] Upgrade kubernetes version

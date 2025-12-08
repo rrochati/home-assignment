@@ -22,33 +22,29 @@ module "eks" {
     ManagedBy = "DevOps"
   }
 
-  # Remove all the aws-auth related arguments as they're not supported
-  # create_aws_auth_configmap = true
-  # manage_aws_auth_configmap = true
-  # aws_auth_users = [...]
-  # aws_auth_roles = [...]
-
-  # EKS Managed Node Group configuration
+  # EKS Managed Node Group configuration for smaller instances
   eks_managed_node_group_defaults = {
     instance_types = var.node_group_instance_types
     attach_cluster_primary_security_group = true
     enable_monitoring = true
+    
+    # Optimized for smaller instances
+    ami_type  = "AL2023_x86_64_STANDARD"
+    disk_size = 20  # Smaller disk for cost optimization
+    disk_type = "gp3"
   }
 
   eks_managed_node_groups = {
     main = {
       name = "${var.cluster_name}-node-group"
 
+      # Use smaller instance types with fallbacks
       instance_types = var.node_group_instance_types
       capacity_type  = "ON_DEMAND"
       
       min_size     = var.node_group_min_size
       max_size     = var.node_group_max_size
       desired_size = var.node_group_desired_size
-
-      ami_type  = "AL2023_x86_64_STANDARD"
-      disk_size = 50
-      disk_type = "gp3"
 
       labels = {
         Environment = var.environment
@@ -64,36 +60,4 @@ module "eks" {
       }
     }
   }
-}
-
-
-# Manual aws-auth ConfigMap management
-resource "kubernetes_config_map" "aws_auth" {
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-  }
-
-  data = {
-    mapRoles = yamlencode([
-      {
-        rolearn  = module.eks.eks_managed_node_groups["main"].iam_role_arn
-        username = "system:node:{{EC2PrivateDNSName}}"
-        groups = [
-          "system:bootstrappers",
-          "system:nodes",
-        ]
-      }
-    ])
-
-    mapUsers = yamlencode([
-      {
-        userarn  = data.aws_caller_identity.current.arn
-        username = data.aws_caller_identity.current.user_id
-        groups   = ["system:masters"]
-      }
-    ])
-  }
-
-  depends_on = [module.eks]
 }

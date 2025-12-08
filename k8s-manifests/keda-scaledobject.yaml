@@ -14,7 +14,7 @@ spec:
     metadata:
       # SQS Queue URL - will be populated from Terraform output
       queueURL: ${SQS_QUEUE_URL}
-      queueLength: "10"  # Scale 1 pod per this number of messages
+      queueLength: "5"  # Scale 1 pod per this number of messages
       awsRegion: ${AWS_REGION}
       # Use IRSA for authentication
       identityOwner: operator
