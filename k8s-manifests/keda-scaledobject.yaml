@@ -1,0 +1,31 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: nginx-sqs-scaler
+  namespace: ${NAMESPACE}
+spec:
+  scaleTargetRef:
+    name: nginx-deployment
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  cooldownPeriod: 60
+  triggers:
+  - type: aws-sqs-queue
+    metadata:
+      # SQS Queue URL - will be populated from Terraform output
+      queueURL: ${SQS_QUEUE_URL}
+      queueLength: "10"  # Scale 1 pod per this number of messages
+      awsRegion: ${AWS_REGION}
+      # Use IRSA for authentication
+      identityOwner: operator
+    authenticationRef:
+      name: keda-trigger-auth-aws-credentials
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: keda-trigger-auth-aws-credentials
+  namespace: ${NAMESPACE}
+spec:
+  podIdentity:
+    provider: aws-eks
