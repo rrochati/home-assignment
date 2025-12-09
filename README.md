@@ -84,7 +84,7 @@ This Terraform project creates an AWS EKS cluster with KEDA addon for autoscalin
    make purge-queue
    ```
 
-- Check nginx status again (it can take a few minutes to scale down)
+- Check nginx status again (it can take 5 minutes to scale down)
    ```bash
    make check-nginx
    ```
