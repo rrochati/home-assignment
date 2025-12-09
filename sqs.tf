@@ -14,34 +14,34 @@ resource "aws_sqs_queue_policy" "keda_queue_policy" {
   queue_url = aws_sqs_queue.keda_queue.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowKEDAAccess"
-        Effect = "Allow"
-        Principal = {
-          AWS = module.keda_irsa.iam_role_arn
-        }
-        Action = [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes",
-          "sqs:GetQueueUrl"
-        ]
-        Resource = aws_sqs_queue.keda_queue.arn
-      },
-      {
-        Sid    = "AllowCurrentUserAccess"
-        Effect = "Allow"
-        Principal = {
-          AWS = data.aws_caller_identity.current.arn
-        }
-        Action = [
-          "sqs:*"
-        ]
-        Resource = aws_sqs_queue.keda_queue.arn
-      }
-    ]
+	Version = "2012-10-17"
+	Statement = [
+	  {
+	    Sid    = "AllowKEDAAccess"
+	    Effect = "Allow"
+	    Principal = {
+	      AWS = module.keda_irsa.iam_role_arn
+	    }
+	    Action = [
+	      "sqs:ReceiveMessage",
+	      "sqs:DeleteMessage",
+	      "sqs:GetQueueAttributes",
+	      "sqs:GetQueueUrl"
+	    ]
+	    Resource = aws_sqs_queue.keda_queue.arn
+	  },
+	  {
+	    Sid    = "AllowCurrentUserAccess"
+	    Effect = "Allow"
+	    Principal = {
+	      AWS = data.aws_caller_identity.current.arn
+	    }
+	    Action = [
+	      "sqs:*"
+	    ]
+	    Resource = aws_sqs_queue.keda_queue.arn
+	  }
+	]
   })
 }
 
@@ -56,7 +56,7 @@ resource "aws_sqs_queue" "keda_dlq" {
 resource "aws_sqs_queue_redrive_policy" "keda_queue_redrive" {
   queue_url = aws_sqs_queue.keda_queue.id
   redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.keda_dlq.arn
-    maxReceiveCount     = 3
+	deadLetterTargetArn = aws_sqs_queue.keda_dlq.arn
+	maxReceiveCount     = 3
   })
 }

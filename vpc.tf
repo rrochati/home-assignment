@@ -1,29 +1,37 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+  version = "5.8.1"  # Compatible with AWS provider ~> 5.0
 
-  name = "${var.project_name}-${var.environment}-vpc"
-  cidr = "10.0.0.0/16"
+  name = var.vpc_name
+  cidr = var.vpc_cidr
 
-  azs             = ["${var.aws_region}a", "${var.aws_region}b", "${var.aws_region}c"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+  azs             = data.aws_availability_zones.available.names
+  private_subnets = var.private_subnets
+  public_subnets  = var.public_subnets
 
-  enable_nat_gateway   = true
-  enable_vpn_gateway   = false
-  single_nat_gateway   = false
+  # Use single NAT gateway to avoid EIP limits
+  enable_nat_gateway = true
+  single_nat_gateway = true  # This uses only 1 EIP instead of 3
+  
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  private_subnet_tags = {
-    "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+  # Alternative: Disable NAT gateways entirely if outbound internet isn't needed
+  # enable_nat_gateway = false
+
+  tags = {
+	"kubernetes.io/cluster/${var.cluster_name}" = "shared"
+	Environment = var.environment
+	ManagedBy   = "Terraform"
   }
 
   public_subnet_tags = {
-    "kubernetes.io/role/elb" = "1"
-    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+	"kubernetes.io/cluster/${var.cluster_name}" = "shared"
+	"kubernetes.io/role/elb"                    = "1"
   }
 
-  tags = local.common_tags
+  private_subnet_tags = {
+	"kubernetes.io/cluster/${var.cluster_name}" = "shared"
+	"kubernetes.io/role/internal-elb"           = "1"
+  }
 }

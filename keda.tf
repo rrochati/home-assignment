@@ -3,31 +3,37 @@ resource "helm_release" "keda" {
   repository = "https://kedacore.github.io/charts"
   chart      = "keda"
   namespace  = "keda"
-  version    = "2.12.1"
 
   create_namespace = true
 
   set {
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.keda_irsa.iam_role_arn
+	name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+	value = module.keda_irsa.iam_role_arn
   }
 
   values = [
-    yamlencode({
-      podIdentity = {
-        aws = {
-          irsa = {
-            enabled = true
-          }
-        }
-      }
-    })
+	yamlencode({
+	  serviceAccount = {
+	    operator = {
+	      annotations = {
+	        "eks.amazonaws.com/role-arn" = module.keda_irsa.iam_role_arn
+	      }
+	    }
+	  }
+	  podIdentity = {
+	    aws = {
+	      irsa = {
+	        enabled = true
+	      }
+	    }
+	  }
+	})
   ]
 
   # Wait for cluster and IRSA to be ready
   depends_on = [
-    module.eks,
-    module.keda_irsa
+	module.eks,
+	module.keda_irsa
   ]
 
   # Add timeout to handle slow cluster startup

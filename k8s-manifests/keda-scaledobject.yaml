@@ -8,7 +8,8 @@ spec:
     name: nginx-deployment
   minReplicaCount: 1
   maxReplicaCount: 10
-  cooldownPeriod: 60
+  cooldownPeriod: 30  # Reduced for faster testing
+  pollingInterval: 10  # Check every 10 seconds
   triggers:
   - type: aws-sqs-queue
     metadata:

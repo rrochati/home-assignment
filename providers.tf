@@ -1,13 +1,15 @@
+
+
 provider "aws" {
   region = var.aws_region
 
   default_tags {
-    tags = local.common_tags
+	tags = local.common_tags
   }
 
   # Add this block to ignore automatic AWS tags
   ignore_tags {
-    keys = ["CreatedAt", "CreatedBy", "Environment", "ManagedBy"]
+	keys = ["CreatedAt", "CreatedBy", "Environment", "ManagedBy"]
   }
 }
 
@@ -26,42 +28,35 @@ data "aws_eks_cluster_auth" "cluster" {
 
 # Configure Kubernetes provider with proper error handling
 provider "kubernetes" {
-  host                   = try(data.aws_eks_cluster.cluster.endpoint, "")
-  cluster_ca_certificate = try(base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data), "")
-  token                  = try(data.aws_eks_cluster_auth.cluster.token, "")
+  host                   = try(module.eks.cluster_endpoint, "")
+  cluster_ca_certificate = try(base64decode(module.eks.cluster_certificate_authority_data), "")
 
-  # Only execute when cluster is ready
   exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    args = [
-      "eks",
-      "get-token",
-      "--cluster-name",
-      var.cluster_name,
-      "--region",
-      var.aws_region,
-    ]
+	api_version = "client.authentication.k8s.io/v1beta1"
+	command     = "aws"
+	args = [
+	  "eks",
+	  "get-token",
+	  "--cluster-name",
+	  try(module.eks.cluster_name, ""),
+	]
   }
 }
 
 provider "helm" {
   kubernetes {
-    host                   = try(data.aws_eks_cluster.cluster.endpoint, "")
-    cluster_ca_certificate = try(base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data), "")
-    token                  = try(data.aws_eks_cluster_auth.cluster.token, "")
+	host                   = try(module.eks.cluster_endpoint, "")
+	cluster_ca_certificate = try(base64decode(module.eks.cluster_certificate_authority_data), "")
 
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      args = [
-        "eks",
-        "get-token",
-        "--cluster-name",
-        var.cluster_name,
-        "--region",
-        var.aws_region,
-      ]
-    }
+	exec {
+	  api_version = "client.authentication.k8s.io/v1beta1"
+	  command     = "aws"
+	  args = [
+	    "eks",
+	    "get-token",
+	    "--cluster-name",
+	    try(module.eks.cluster_name, ""),
+	  ]
+	}
   }
 }

@@ -42,7 +42,7 @@ This Terraform project creates an AWS EKS cluster with KEDA addon for autoscalin
    # Plan and apply
    make plan          # Review changes
    make apply-plan    # Apply changes from file plan
-   make apply         # Apply changes
+   make apply         # Optional: Apply changes
    ```
 
 5. **Configure kubectl:**
@@ -118,9 +118,17 @@ This Terraform project creates an AWS EKS cluster with KEDA addon for autoscalin
 - Check SQS permissions: Review the queue policy in AWS Console
 
 ## To do:
-[ ] Add safety confirm for cleanup steps
-[ ] Improve files and folder structure
 [ ] Improve security
-   -  Adjust user role and security groups to follow least privilege principle
+   -  Adjust roles and security groups to follow least privilege principle
+[ ] Improve files and folder structure
+[ ] Add safety confirm for cleanup steps
 [ ] Fine tune scaling up and down for a more progressive behavior
 [ ] Upgrade kubernetes version
+[ ] Troubleshoot this warning:
+│ Warning: Argument is deprecated
+│ 
+│   with module.eks.aws_iam_role.this[0],
+│   on .terraform/modules/eks/main.tf line 293, in resource "aws_iam_role" "this":
+│  293: resource "aws_iam_role" "this" {
+│ 
+│ inline_policy is deprecated. Use the aws_iam_role_policy resource instead. If Terraform should exclusively manage all inline policy associations (the current behavior of this argument), use the aws_iam_role_policies_exclusive resource as well.
