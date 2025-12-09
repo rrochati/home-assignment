@@ -1,6 +1,6 @@
 .terraform/
-terraform.tfstate
-terraform.tfstate.backup
+#terraform.tfstate
+#terraform.tfstate.backup
 *.tfvars
 *.tfplan
 .terraformrc
@@ -9,3 +9,4 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+.terraform.lock.hcl
