@@ -1,3 +1,11 @@
 .terraform/
 terraform.tfstate
 terraform.tfstate.backup
+*.tfvars
+*.tfplan
+.terraformrc
+terraform.rc
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
