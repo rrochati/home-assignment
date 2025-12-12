@@ -2,7 +2,17 @@
 
 # Initialize Terraform
 init:
-	terraform init
+	@S3_BUCKET=$$(grep 's3_bucket' terraform.tfvars | awk -F'=' '{print $$2}' | tr -d ' "') && \
+	DYNAMO_DB_TABLE=$$(grep 'dynamo_db_table' terraform.tfvars | awk -F'=' '{print $$2}' | tr -d ' "') && \
+	terraform init \
+		-backend-config="bucket=$$S3_BUCKET" \
+		-backend-config="key=home-assignment/eu-north-1/terraform.tfstate" \
+		-backend-config="dynamodb_table=$$DYNAMO_DB_TABLE"
+
+# Re-initialize Terraform (useful after branch changes)
+reinit:
+	rm -rf .terraform
+	$(MAKE) init
 
 # Plan Terraform changes
 plan:
@@ -36,7 +46,7 @@ kubeconfig:
 	    aws eks update-kubeconfig --region $$(terraform output -raw aws_region) --name $$(terraform output -raw cluster_name); \
 	else \
 	    echo "Terraform outputs not available, using values from terraform.tfvars..."; \
-	    aws eks update-kubeconfig --region us-east-1 --name ha-eks; \
+	    aws eks update-kubeconfig --region eu-north-1 --name ha-eks; \
 	fi
 
 # Check KEDA installation
@@ -48,7 +58,7 @@ deploy-nginx:
 	@echo "Deploying nginx with KEDA autoscaling..."
 	@echo "Getting Terraform outputs..."
 	@SQS_QUEUE_URL=$$(terraform output -raw sqs_queue_url 2>/dev/null || echo "") && \
-	AWS_REGION=$$(terraform output -raw aws_region 2>/dev/null || echo "us-east-1") && \
+	AWS_REGION=$$(terraform output -raw aws_region 2>/dev/null || echo "eu-north-1") && \
 	KEDA_IRSA_ROLE_ARN=$$(terraform output -raw keda_irsa_role_arn 2>/dev/null || echo "") && \
 	NAMESPACE="webapp" && \
 	echo "SQS Queue URL: $$SQS_QUEUE_URL" && \

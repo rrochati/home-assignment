@@ -1,12 +1,18 @@
+# Local Terraform directories
 .terraform/
-#terraform.tfstate
-#terraform.tfstate.backup
-*.tfvars
+*.tfstate
+*.tfstate.*
+crash.log
 *.tfplan
-.terraformrc
-terraform.rc
+
+# .tfvars files should be ignored to prevent secrets from being committed
+*.tfvars
+
+# Ignore override files as they are meant to be used locally
 override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
-.terraform.lock.hcl
+
+# Mac-specific files
+.DS_Store

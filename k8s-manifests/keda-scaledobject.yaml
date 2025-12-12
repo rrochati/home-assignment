@@ -10,6 +10,11 @@ spec:
   maxReplicaCount: 10
   cooldownPeriod: 30  # Reduced for faster testing
   pollingInterval: 10  # Check every 10 seconds
+  advanced:
+    horizontalPodAutoscalerConfig: # Optional. Section to specify HPA related options
+    behavior:                      # Optional. Use to modify HPA's scaling behavior
+        scaleDown:
+          stabilizationWindowSeconds: 30
   triggers:
   - type: aws-sqs-queue
     metadata:

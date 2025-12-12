@@ -4,6 +4,7 @@ This Terraform project creates an AWS EKS cluster with KEDA addon for autoscalin
 
 ## Architecture
 
+- **Backend**: S3 bucket
 - **EKS Cluster**: Kubernetes 1.32 cluster
 - **Node Group**: 2 on-demand EC2 instances (t3.medium)
 - **VPC**: Standard VPC with 3 availability zones
@@ -15,7 +16,8 @@ This Terraform project creates an AWS EKS cluster with KEDA addon for autoscalin
 - AWS CLI configured with appropriate permissions
 - Terraform >= 1.0
 - kubectl
-- Helm (optional, for manual KEDA management)
+- Helm (for KEDA management)
+- S3 Bucket adn DynamoDB Table for backend
 
 ## Deployment
 
@@ -31,7 +33,7 @@ This Terraform project creates an AWS EKS cluster with KEDA addon for autoscalin
    ```bash
    export AWS_ACCESS_KEY_ID="your-access-key-id"
    export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
-   export AWS_DEFAULT_REGION="us-east-1"
+   export AWS_DEFAULT_REGION="your-default-region"
    ```
 
 4. **Initialize and apply Terraform:**
@@ -118,17 +120,20 @@ This Terraform project creates an AWS EKS cluster with KEDA addon for autoscalin
 - Check SQS permissions: Review the queue policy in AWS Console
 
 ## To do:
-[ ] Improve security
+- [X] Add S3 backend
+- [ ] Improve security
    -  Adjust roles and security groups to follow least privilege principle
-[ ] Improve files and folder structure
-[ ] Add safety confirm for cleanup steps
-[ ] Fine tune scaling up and down for a more progressive behavior
-[ ] Upgrade kubernetes version
-[ ] Troubleshoot this warning:
-│ Warning: Argument is deprecated
-│ 
-│   with module.eks.aws_iam_role.this[0],
-│   on .terraform/modules/eks/main.tf line 293, in resource "aws_iam_role" "this":
-│  293: resource "aws_iam_role" "this" {
-│ 
-│ inline_policy is deprecated. Use the aws_iam_role_policy resource instead. If Terraform should exclusively manage all inline policy associations (the current behavior of this argument), use the aws_iam_role_policies_exclusive resource as well.
+- [ ] Improve files and folder structure
+- [ ] Add safety confirm for cleanup steps
+- [ ] Fine tune scaling up and down for a more progressive behavior
+- [X] Upgrade kubernetes version
+- [ ] Troubleshoot this warning:
+   ```bash
+   │ Warning: Argument is deprecated
+   │ 
+   │   with module.eks.aws_iam_role.this[0],
+   │   on .terraform/modules/eks/main.tf line 293, in resource "aws_iam_role" "this":
+   │  293: resource "aws_iam_role" "this" {
+   │ 
+   │ inline_policy is deprecated. Use the aws_iam_role_policy resource instead. If Terraform should exclusively manage all inline policy associations (the current behavior of this argument), use the aws_iam_role_policies_exclusive resource as well.
+   ```

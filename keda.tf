@@ -11,6 +11,16 @@ resource "helm_release" "keda" {
 	value = module.keda_irsa.iam_role_arn
   }
 
+  set {
+    name  = "irsa.enabled"
+    value = "true"
+  }
+
+  set {
+    name  = "irsa.roleArn"
+    value = module.keda_irsa.iam_role_arn
+  }
+
   values = [
 	yamlencode({
 	  serviceAccount = {

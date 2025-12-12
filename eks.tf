@@ -3,11 +3,13 @@ module "eks" {
   version = "19.21.0"  # This version works with AWS provider ~> 5.0
 
   cluster_name    = var.cluster_name
-  cluster_version = "1.32"
+  cluster_version = "1.34"
 
   vpc_id                         = module.vpc.vpc_id
   subnet_ids                     = module.vpc.private_subnets
   cluster_endpoint_public_access = true
+
+  cloudwatch_log_group_retention_in_days = 3
 
   create_cluster_primary_security_group_tags = true
 
